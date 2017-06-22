@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="info">
+    <Properties>
+        <!--
+        File Log Configuration 1.4
+     
+            log-path: Path location of file logs. Use relative or specific path (example: logs)
+            log-name: File name for logs (example: filename)
+            SizeBasedTriggeringPolicy: Log size rollover limit (example 1MB)
+            DefaultRolloverStrategy: Max number of Logs rollover limit.
+        -->
+        <Property name="log-path">logs</Property>
+        <Property name="log-name">cefconnector</Property>
+        <Property name="SizeBasedTriggeringPolicy">1 MB</Property>
+        <Property name="DefaultRolloverStrategy">20</Property>
+        <!--
+        CEF Syslog Configuration
+        
+            CEFHost: Remote CEF Syslog Server Host (example: 127.0.0.1)
+            CEFPort: Remote CEF Syslog Server Port (example: 514)
+            CEFProtocol: Remote CEF Syslog Server Protocol (UDP/TCP)      
+        
+        -->
+        <Property name="CEFHost">localhost</Property>
+        <Property name="CEFPort">546</Property>
+        <Property name="CEFProtocol">TCP</Property>
+        <!--
+        Log Patterns
+        
+            logPattern-CEF: CEF syslog pattern for remote CEF syslog server (do not change)
+            logPattern-Console: Console log pattern
+            logPattern-FileInfo: File log pattern for all [INFO] type logs
+            logPattern-FileError: File log pattern for all [ERROR] type logs
+        -->
+        <Property name="logPattern-CEF">%msg%n</Property>
+        <Property name="logPattern-Console">[%-5level][%t] %c{1}:%L- %msg%n</Property>
+        <Property name="logPattern-FileInfo">[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n</Property>
+        <Property name="logPattern-FileWarn">[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n</Property>
+        <Property name="logPattern-FileError">[%-5level] %d [%t] %c:%M:%L- %m%n</Property>
+    </Properties>
+    <CustomLevels>
+        <CustomLevel name="SYSLOG" intLevel="50" />
+    </CustomLevels>
+    <Appenders>
+        <RollingFile name="file-log-info" fileName="${log-path}/${log-name}-info.log"
+        filePattern="${log-path}/${log-name}-info-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${logPattern-FileInfo}"/>
+            <Filters>
+
+            <!-- First deny warn, error and fatal messages -->
+            <ThresholdFilter level="warn"  onMatch="DENY" onMismatch="NEUTRAL"/>
+
+            <!-- Then accept info, warn, error, fatal and deny debug/trace -->
+            <ThresholdFilter level="info"  onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${SizeBasedTriggeringPolicy}" />
+            </Policies>
+            <DefaultRolloverStrategy max="${DefaultRolloverStrategy}"/>
+        </RollingFile>
+        <RollingFile name="file-log-warn" fileName="${log-path}/${log-name}-warn.log"
+        filePattern="${log-path}/${log-name}-warn-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${logPattern-FileWarn}"/>
+            <Filters>
+
+            <!-- First deny error and fatal messages -->
+            <ThresholdFilter level="error"  onMatch="DENY" onMismatch="NEUTRAL"/>
+
+            <!-- Then accept  warn -->
+            <ThresholdFilter level="warn"  onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${SizeBasedTriggeringPolicy}" />
+            </Policies>
+            <DefaultRolloverStrategy max="${DefaultRolloverStrategy}"/>
+        </RollingFile>
+        <RollingFile name="file-log-error" fileName="${log-path}/${log-name}-error.log"
+        filePattern="${log-path}/${log-name}-error-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${logPattern-FileError}"/>
+            <Filters>
+
+            <!-- First deny warn, error and fatal messages -->
+            <ThresholdFilter level="syslog"  onMatch="DENY" onMismatch="NEUTRAL"/>
+
+            <!-- Then accept info, warn, error, fatal and deny debug/trace -->
+            <ThresholdFilter level="error"  onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${SizeBasedTriggeringPolicy}" />
+            </Policies>
+            <DefaultRolloverStrategy max="${DefaultRolloverStrategy}"/>
+        </RollingFile>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${logPattern-Console}"/>
+        </Console>
+        <Socket name="cefsyslog" host="${CEFHost}" port="${CEFPort}" protocol="${CEFProtocol}">
+            <PatternLayout pattern="${logPattern-CEF}"/>
+        </Socket>
+    </Appenders>
+    <Loggers>
+    <Root level="info" additivity="false">
+        <appender-ref ref="console"/>
+        <appender-ref ref="file-log-info" level="info"/>
+        <appender-ref ref="file-log-warn" level="warn"/>
+        <appender-ref ref="file-log-error" level="error"/>
+        <appender-ref ref="cefsyslog" level="syslog"/>
+    </Root>
+</Loggers>
+</Configuration>
