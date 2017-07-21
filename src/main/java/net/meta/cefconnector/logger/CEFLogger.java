@@ -383,19 +383,21 @@ public class CEFLogger {
         
         return pAction;
     }
+    
     /*
-        Description: Calculate eventClassId based on applied action
-        Arguments: JSONObject rec
-        Return: String
-    */
+    Description: Calculate eventClassId based on applied action
+    Arguments: JSONObject rec
+    Return: String
+     */
     private String eventClassId(JSONObject rec){
-        String pAction = appliedAction(rec);
-        
-        if(pAction.equals("alert)")||pAction.equals("monitor)"))
-            return "detect";
-        else
-            return "mitigate";
+    	String pAction = appliedAction(rec);
+
+    	if(pAction.equalsIgnoreCase("alert") || pAction.equalsIgnoreCase("monitor"))
+    		return "detect";
+    	else
+    		return "mitigate";
     }
+    
     /*
         Description: Calculate requestURL based on httpMessage, tls, host, httpMessage and path
         Arguments: JSONObject rec
