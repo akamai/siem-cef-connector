@@ -11,7 +11,7 @@
         -->
         <Property name="log-path">logs</Property>
         <Property name="log-name">cefconnector</Property>
-        <Property name="SizeBasedTriggeringPolicy">1 MB</Property>
+        <Property name="SizeBasedTriggeringPolicy">100 MB</Property>
         <Property name="DefaultRolloverStrategy">20</Property>
         <!--
         CEF Syslog Configuration
@@ -98,7 +98,7 @@
         </Socket>
     </Appenders>
     <Loggers>
-    <Root level="info" additivity="false">
+    <Root level="error" additivity="false">
         <appender-ref ref="console"/>
         <appender-ref ref="file-log-info" level="info"/>
         <appender-ref ref="file-log-warn" level="warn"/>

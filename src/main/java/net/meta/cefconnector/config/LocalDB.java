@@ -5,25 +5,17 @@
  */
 package net.meta.cefconnector.config;
 
-import net.meta.cefconnector.config.CEFConnectorConfiguration;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-        
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
-import java.text.ParseException;
-import org.sqlite.JDBC;
 import java.util.TimeZone;
-import java.text.DateFormat;
-import java.util.Date;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 /**
  *
  * @author krassouli
