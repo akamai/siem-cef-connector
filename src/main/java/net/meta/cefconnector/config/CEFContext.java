@@ -2,9 +2,6 @@ package net.meta.cefconnector.config;
 
 import org.apache.http.client.HttpClient;
 
-import net.meta.cefconnector.akamai.EventConsumer;
-import net.meta.cefconnector.akamai.EventProducer;
-
 public class CEFContext {
 
 	private boolean offsetMode;
@@ -16,8 +13,53 @@ public class CEFContext {
 	private Long dataLimit;
 	private boolean debugMode;
 	private String configIds;
-
 	private HttpClient client;
+	private String[] formatHeaders;
+	private String[] formatExtensions;
+	private String[] base64Fields;
+	private String[] urlEncodedFields;
+	private String delimiter;
+	
+	
+	public String[] getBase64Fields() {
+		return base64Fields;
+	}
+
+	public void setBase64Fields(String[] base64Fields) {
+		this.base64Fields = base64Fields;
+	}
+
+	public String[] getUrlEncodedFields() {
+		return urlEncodedFields;
+	}
+
+	public void setUrlEncodedFields(String[] urlEncodedFields) {
+		this.urlEncodedFields = urlEncodedFields;
+	}
+
+	public String getDelimiter() {
+		return delimiter;
+	}
+
+	public void setDelimiter(String delimiter) {
+		this.delimiter = delimiter;
+	}
+
+	public String[] getFormatExtensions() {
+		return formatExtensions;
+	}
+
+	public void setFormatExtensions(String[] formatExtensions) {
+		this.formatExtensions = formatExtensions;
+	}
+
+	public String[] getFormatHeaders() {
+		return formatHeaders;
+	}
+
+	public void setFormatHeaders(String[] formatHeaders) {
+		this.formatHeaders = formatHeaders;
+	}
 
 	public CEFContext() {
 

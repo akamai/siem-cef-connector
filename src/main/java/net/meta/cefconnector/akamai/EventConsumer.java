@@ -50,7 +50,7 @@ public class EventConsumer implements Runnable {
 						}
 					} else {
 						long oneRecstart = System.currentTimeMillis();
-						logger.processLogLine(message.getEvent());
+						logger.processLogLine(context, message.getEvent());
 						long oneRecend = System.currentTimeMillis();
 						//log.error("Time Taken to process a single record :" + (oneRecend - oneRecstart));
 
