@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import net.meta.cefconnector.config.CEFConnectorConfiguration;
+import net.meta.cefconnector.config.CEFContext;
 
 /**
  * Logger for CEF file
@@ -23,7 +24,9 @@ import net.meta.cefconnector.config.CEFConnectorConfiguration;
 public class CEFLogger {
 
 	private static final Logger log = LogManager.getLogger(CEFLogger.class);
-
+	private static final Pattern API = Pattern.compile("\\$\\{([^}]+)\\}");
+	private static final Pattern Static = Pattern.compile(".*\\\"(.*)\\\".*");
+	private static final Pattern Calculated = Pattern.compile("([^}]+)\\(\\)");	
 	/*
 	 * Description: This function will take responseData string and convert it
 	 * to CEF format. If successful, it will return the offset token Arguments:
@@ -67,7 +70,8 @@ public class CEFLogger {
 				 * key/value map for all the cef extension tags
 				 * 
 				 */
-				params = prepareParams(new JSONObject(line));
+				// Atul -- Passing null just to avoid compilation error, this meth
+				params = prepareParams(null, new JSONObject(line));
 
 				StringBuilder logLine = new StringBuilder();
 				String logLineHeader = "";
@@ -129,7 +133,7 @@ public class CEFLogger {
 	 * Map<String, String>
 	 */
 
-	private Map<String, String> prepareParams(JSONObject rec) {
+	private Map<String, String> prepareParams(CEFContext context, JSONObject rec) {
 
 		Map<String, String> params = new LinkedHashMap<String, String>();
 
@@ -140,19 +144,17 @@ public class CEFLogger {
 
 		// Get User defined format. This will map akamai api values to defined
 		// extension attributes
-		String CEFFormatHeader = CEFConnectorConfiguration.getCEFFormatHeader();
-		String CEFFormatExtension = CEFConnectorConfiguration.getCEFFormatExtension();
-		String[] base64Fields = CEFConnectorConfiguration.getbase64Fields().split(";");
-		String[] URLEncodedFields = CEFConnectorConfiguration.getURLEncodedFields().split(";");
-		String delim = CEFConnectorConfiguration.getmultiValueDelimn();
+		String[] base64Fields = context.getBase64Fields();
+		String[] URLEncodedFields = context.getUrlEncodedFields();
+		String delim = context.getDelimiter();
 
 		// Split the header format from properties file
-		String[] CEFFormatHeaderArray = CEFFormatHeader.split("(?<!\\\\)\\|");
+		String[] CEFFormatHeaderArray = context.getFormatHeaders();
 
 		// split the extension format from properties file
-		String[] CEFFormatExtensionArray = CEFFormatExtension.split("[ ]+(?=([^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)", -1);
+		String[] CEFFormatExtensionArray = context.getFormatExtensions();
 
-		for (int ctrl = 0; ((!CEFFormatExtension.equals("")) && (ctrl < CEFFormatExtensionArray.length)); ctrl++) {
+		for (int ctrl = 0; (CEFFormatExtensionArray != null && ctrl < CEFFormatExtensionArray.length); ctrl++) {
 
 			String extension = CEFFormatExtensionArray[ctrl];
 			String[] extensionPair = extension.split("=");
@@ -161,13 +163,12 @@ public class CEFLogger {
 			String AkamaiParam = "";
 
 			// Determine if Akamai Value is Static or API based
-			Pattern API = Pattern.compile("\\$\\{([^}]+)\\}");
-			Pattern Static = Pattern.compile(".*\\\"(.*)\\\".*");
+
 			Matcher mAPI = API.matcher(AkamaiParamRaw);
 			Matcher mStatic = Static.matcher(AkamaiParamRaw);
 
 			// Determine if Akamai Value is Static or Calculated based
-			Pattern Calculated = Pattern.compile("([^}]+)\\(\\)");
+
 			Matcher mCalculated = Calculated.matcher(AkamaiParamRaw);
 
 			if (mCalculated.find()) // Calculated Akamai API variable defined by
@@ -255,7 +256,6 @@ public class CEFLogger {
 		for (int ctrl = 0; ctrl < CEFFormatHeaderArray.length; ctrl++) {
 
 			// Determine if Akamai Value is Static or Calculated based
-			Pattern Calculated = Pattern.compile("([^}]+)\\(\\)");
 			Matcher mCalculated = Calculated.matcher(CEFFormatHeaderArray[ctrl]);
 
 			if (mCalculated.find()) // Calculated Akamai API variable defined by
@@ -503,7 +503,7 @@ public class CEFLogger {
 		return tempString;
 	}
 
-	public void processLogLine(String line) {
+	public void processLogLine(CEFContext context, String line) {
 
 		Map<String, String> params = new LinkedHashMap<String, String>();
 
@@ -516,7 +516,8 @@ public class CEFLogger {
 			 * key/value map for all the cef extension tags
 			 * 
 			 */
-			params = prepareParams(new JSONObject(line));
+
+			params = prepareParams(context, new JSONObject(line));
 
 			StringBuilder logLine = new StringBuilder();
 			String logLineHeader = "";

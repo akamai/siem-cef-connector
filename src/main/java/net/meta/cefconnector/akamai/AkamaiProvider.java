@@ -3,6 +3,7 @@ package net.meta.cefconnector.akamai;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -120,6 +121,9 @@ public class AkamaiProvider {
 		HttpClient client = getClient(context);
 
 		HttpGet request = new HttpGet(requestUrl);
+		// Checked in the code requested by Dipen
+		request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+		request.addHeader(HttpHeaders.ACCEPT_ENCODING, "gzip");
 		log.info(String.format("Calling OPEN API at %s", requestUrl));
 
 		HttpResponse response = client.execute(request);
