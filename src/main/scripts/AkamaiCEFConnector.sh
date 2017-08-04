@@ -2,7 +2,7 @@
 
 CEFConnector_start() {
     echo "Starting Akamai CEF Connector"
-    java -Dfile.encoding=UTF-8 -Xmx512m \
+    java -Dfile.encoding=UTF-8 -Xmx2048m -Xms2048m \
             -DCEFConnector.kill.mark.dummy=CEFCONNECTOR.KILL.MARK \
             -jar ${artifactId}-${version}.jar 1>>/dev/null 2>>/dev/null &
     echo "Akamai CEF Connector started"
