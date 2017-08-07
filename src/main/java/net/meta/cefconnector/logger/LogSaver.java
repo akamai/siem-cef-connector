@@ -22,7 +22,10 @@ public class LogSaver {
 	 *            message to log
 	 */
 	static void save(String message) {
-		log.log(Level.forName("syslog", 50), message);
+		// Writing Event to Socket Appender
+		//log.log(Level.forName("syslog", 50), message);
+		LogManager.getLogger("cefsyslog").log(Level.getLevel("syslog"), message);
+
 		log.info(message);
 	}
 }
