@@ -97,13 +97,18 @@
             <PatternLayout pattern="${logPattern-CEF}"/>
         </Socket>
     </Appenders>
-    <Loggers>
-    <Root level="error" additivity="false">
-        <appender-ref ref="console"/>
-        <appender-ref ref="file-log-info" level="info"/>
-        <appender-ref ref="file-log-warn" level="warn"/>
-        <appender-ref ref="file-log-error" level="error"/>
-        <appender-ref ref="cefsyslog" level="syslog"/>
-    </Root>
-</Loggers>
+	<Loggers>
+		<Root level="error" additivity="false">
+	    	<!-- 
+	        <appender-ref ref="console"/>
+	        <appender-ref ref="file-log-info" level="info"/>
+	        <appender-ref ref="file-log-warn" level="warn"/>
+	        <appender-ref ref="cefsyslog" level="syslog"/>
+	        -->  
+			<appender-ref ref="file-log-error" level="error" />
+		</Root>
+		<Logger name="cefsyslog" additivity="false">
+			<AppenderRef ref="cefsyslog" level="SYSLOG" />
+		</Logger>
+	</Loggers>
 </Configuration>
