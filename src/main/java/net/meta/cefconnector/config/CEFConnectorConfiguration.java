@@ -17,10 +17,10 @@ public class CEFConnectorConfiguration {
     private static final String REFRESH_PERIOD = "connector.refresh.period";
     private static final String TIMEZONE = "connector.timezone";
 
-    private static final long DEFAULT_REFRESH_PERIOD = 300;
+    private static final long DEFAULT_REFRESH_PERIOD = 60;
     private static final String DEFAULT_TIMEZONE = "UTC";
     private static final int DEFAULT_RETRY = 5;
-    private static final int DEFAULT_LIMIT = 0;
+    private static final int DEFAULT_LIMIT = 200000;
     
     private static final String AKAMAI_POLICIES = "akamai.data.configs";
     
