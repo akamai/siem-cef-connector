@@ -1,8 +1,8 @@
 package net.meta.cefconnector.logger;
 
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Special class for logging messages to filelog and/or syslog
@@ -23,9 +23,10 @@ public class LogSaver {
 	 */
 	static void save(String message) {
 		// Writing Event to Socket Appender
-		//log.log(Level.forName("syslog", 50), message);
+		// log.log(Level.forName("syslog", 50), message);
 		LogManager.getLogger("cefsyslog").log(Level.getLevel("syslog"), message);
-
-		log.info(message);
+		if (log.isDebugEnabled()) {
+			log.debug(message);
+		}
 	}
 }

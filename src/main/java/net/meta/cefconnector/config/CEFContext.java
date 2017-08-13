@@ -19,8 +19,7 @@ public class CEFContext {
 	private String[] base64Fields;
 	private String[] urlEncodedFields;
 	private String delimiter;
-	
-	
+
 	public String[] getBase64Fields() {
 		return base64Fields;
 	}
@@ -182,4 +181,33 @@ public class CEFContext {
 		return interval;
 	}
 
+	@Override
+	/*public String toString() {
+		String info = String.format(
+				"context {mode=%s, requestUrlHost=%s, clientSecret=%s, clientToken=%s, accessToken=%s, host=%s, configIds=[%s], fetch interval=%sms, fetch size=%s",
+				(offsetMode ? "Offset Based" : "Time Based"), requestUrlHost, clientSecret, clientToken, accessToken,
+				host, configIds, interval, dataLimit);
+
+		if (offsetMode) {
+			info += String.format(", data offset=%s}", dataOffset);
+		} else {
+			info += String.format(", Time Range between %s and %s}", dateTimeFrom, dateTimeTo);
+		}
+
+		return info;
+	}*/
+	public String toString() {
+		String info = String.format(
+				"context {mode=%s, requestUrlHost=%s, configIds=[%s], fetch interval=%sms, fetch size=%s",
+				(offsetMode ? "Offset Based" : "Time Based"), requestUrlHost, configIds, interval, dataLimit);
+
+		if (offsetMode) {
+			info += String.format(", data offset=%s}", dataOffset);
+		} else {
+			info += String.format(", Time Range between %s and %s}", dateTimeFrom, dateTimeTo);
+		}
+
+		return info;
+	}	
+	
 }

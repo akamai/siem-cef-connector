@@ -117,14 +117,13 @@ public class AkamaiProvider {
 	 * HttpResponse
 	 */
 	private static HttpResponse callAPI(String requestUrl, CEFContext context) throws IOException {
-
+		log.info(String.format("OPEN API Request URL:%s", requestUrl));
 		HttpClient client = getClient(context);
 
 		HttpGet request = new HttpGet(requestUrl);
 		// Checked in the code requested by Dipen
 		request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
 		request.addHeader(HttpHeaders.ACCEPT_ENCODING, "gzip");
-		log.info(String.format("Calling OPEN API at %s", requestUrl));
 
 		HttpResponse response = client.execute(request);
 

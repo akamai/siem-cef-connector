@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import net.meta.cefconnector.config.CEFConnectorConfiguration;
 import net.meta.cefconnector.config.CEFContext;
 
 /**
@@ -26,7 +25,7 @@ public class CEFLogger {
 	private static final Logger log = LogManager.getLogger(CEFLogger.class);
 	private static final Pattern API = Pattern.compile("\\$\\{([^}]+)\\}");
 	private static final Pattern Static = Pattern.compile(".*\\\"(.*)\\\".*");
-	private static final Pattern Calculated = Pattern.compile("([^}]+)\\(\\)");	
+	private static final Pattern Calculated = Pattern.compile("([^}]+)\\(\\)");
 	/*
 	 * Description: This function will take responseData string and convert it
 	 * to CEF format. If successful, it will return the offset token Arguments:
@@ -70,7 +69,8 @@ public class CEFLogger {
 				 * key/value map for all the cef extension tags
 				 * 
 				 */
-				// Atul -- Passing null just to avoid compilation error, this meth
+				// Atul -- Passing null just to avoid compilation error, this
+				// meth
 				params = prepareParams(null, new JSONObject(line));
 
 				StringBuilder logLine = new StringBuilder();
@@ -504,7 +504,9 @@ public class CEFLogger {
 	}
 
 	public void processLogLine(CEFContext context, String line) {
-
+		if (log.isDebugEnabled()) {
+			log.debug(line);
+		}
 		Map<String, String> params = new LinkedHashMap<String, String>();
 
 		try {
@@ -545,9 +547,8 @@ public class CEFLogger {
 			LogSaver.save((logLineHeader + logLine.toString()).replaceAll("\\s+$", ""));
 		} // if the current responseData newline is not a proper JSONObject,
 			// skip and log to error
-		catch (JSONException e) {
-			log.error("JSON Object Error: " + e);
-			log.error("JSON Object: " + line);
+		catch (Exception e) {
+			log.error("JSON Object: " + line + "\n Context :" + context.toString(), e);
 		}
 	}
 

@@ -32,37 +32,44 @@ public class EventConsumer implements Runnable {
 				Message message = queue.poll(10, TimeUnit.MILLISECONDS);
 				if (message != null) {
 					if (message.isToken()) {
-						String offset = logger.processToken(message.getEvent());
+						try {
+							String offset = logger.processToken(message.getEvent());
 
-						if (context.isOffsetMode() || (!context.isOffsetMode()
-								&& (context.getDateTimeTo() == null || context.getDateTimeTo().isEmpty()))) {
-							try {
+							if (context.isOffsetMode() || (!context.isOffsetMode()
+									&& (context.getDateTimeTo() == null || context.getDateTimeTo().isEmpty()))) {
+
 								long oneRecstart = System.currentTimeMillis();
 								DBUtil.setLastOffset(offset);
 								context.setDataOffset(offset);
 								long oneRecend = System.currentTimeMillis();
-								log.error("Time Taken to process offset :" + (oneRecend - oneRecstart));
-								done = true;
-							} catch (SQLException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+								log.info("Time Taken to process offset :" + (oneRecend - oneRecstart));
+
 							}
+						} catch (SQLException e) {
+							log.error("Error persisting offset " + message.getEvent() + "\n Context :"
+									+ context.toString(), e);
+						} catch (Exception e) {
+							log.error("Error processing offset " + message.getEvent() + "\n Context :"
+									+ context.toString(), e);
+						} finally {
+							done = true;
 						}
 					} else {
-						long oneRecstart = System.currentTimeMillis();
+						// long oneRecstart = System.currentTimeMillis();
 						logger.processLogLine(context, message.getEvent());
-						long oneRecend = System.currentTimeMillis();
-						//log.error("Time Taken to process a single record :" + (oneRecend - oneRecstart));
-
+						// long oneRecend = System.currentTimeMillis();
+						// log.info("Time Taken to process a single record :" +
+						// (oneRecend - oneRecstart));
 					}
 				}
-				// System.out.println(message);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				log.error("Context Info=%s", context.toString());
+				log.error("Consumer thread interrupted ", e);
+				done = true;
 			}
 		}
 		long end = System.currentTimeMillis();
-		log.error("Consumer Time Taken :" + (end - start));
+		log.info("Consumer Time Taken :" + (end - start));
 	}
 
 }

@@ -43,12 +43,12 @@ public class CEFConnectorApp {
 	}
 
 	private CEFContext init() throws Exception {
-		log.info("*** Starting CEF Connector ***");
+		log.debug("*** Starting CEF Connector ***");
 
 		stopped = false;
 
 		DBUtil.initDatabase();
-		log.info("*** Database Initialization  Completed ***");
+		log.debug("*** Database Initialization  Completed ***");
 
 		CEFContext context = new CEFContext();
 
@@ -132,6 +132,7 @@ public class CEFConnectorApp {
 				// retrieve the status code of the http response
 				int statusCode = response.getStatusLine().getStatusCode();
 
+				log.debug("Open Api Status Code " + statusCode);
 				// Successful http response, attempt to process
 				if (statusCode == 200) {
 					BlockingQueue<Message> queue = new LinkedBlockingQueue<Message>(1024 * 256);
@@ -145,7 +146,6 @@ public class CEFConnectorApp {
 					consumer2.start();
 					consumer3.start();
 
-					log.info("Success " + statusCode);
 					try (BufferedReader is = new BufferedReader(
 							new InputStreamReader(response.getEntity().getContent()), 1024 * 32)) {
 						String previousLine = is.readLine();
@@ -168,25 +168,30 @@ public class CEFConnectorApp {
 					}
 					// If request was time based and successful, use token
 					// next
-					if (!context.isOffsetMode())
-						context.setOffsetMode(true);
 
 					// reset ctrl
 					retryCtrl = 0;
 					consumer1.join();
 					consumer2.join();
 					consumer3.join();
-					printStatistic(producer);
+					
+
+					printStatistic(producer, context);
+					
+					if (!context.isOffsetMode())
+						context.setOffsetMode(true);
 					// unsuccessful http response, log error
 				} else {
 					// log error http response status code
-					log.error("Error " + statusCode);
+					log.error(context.toString());
+					log.error("Open Api Status Code " + statusCode);
 					String responseData = EntityUtils.toString(response.getEntity());
-					String responseError = "";
+					
 					// If the error response is in json format (expected if
 					// the correct http endpoint was reached) then log the
 					// response to error
 					if (isJSONValid(responseData)) {
+						String responseError = "";
 						JSONObject lineObject = new JSONObject(responseData);
 						responseError = String.format(
 								"Type: %s%nTitle: %s%nInstance: %s%nDetail: %s%nMethod: %s%nServer IP: %s%nClient IP: %s%nRequest ID: %s%nRequest Time: %s%n",
@@ -202,7 +207,7 @@ public class CEFConnectorApp {
 					} // if the response is not a valid json format, then
 						// just log the response to error
 					else {
-						log.error(responseError);
+						log.error(responseData);
 
 						// attempt http request again
 						retryCtrl++;
@@ -210,6 +215,7 @@ public class CEFConnectorApp {
 				}
 			} catch (Throwable e) {
 				// Unknown error happened, try attempt http response again
+				log.error(context.toString());
 				log.error("Error Retrieving Security Events " + e);
 				retryCtrl++;
 			}
@@ -218,7 +224,7 @@ public class CEFConnectorApp {
 				// if the http request returned a non 200 status, try again
 				// until retryMax is reached
 				if (retryCtrl > 0 && retryCtrl <= retryMax)
-					log.info("Will retry on next pull..." + retryCtrl + "/" + retryMax);
+					log.debug("Will retry on next pull..." + retryCtrl + "/" + retryMax);
 				// If the http request was attempted retryMax times, then stop
 				// the driver and log to error
 				else if (retryCtrl > retryMax)
@@ -228,14 +234,14 @@ public class CEFConnectorApp {
 				// is a end epoch time, stop the connector and log the times
 				// pulled
 				if (retryCtrl == 0 && (context.getDateTimeTo() != null && !context.getDateTimeTo().isEmpty())) {
-					log.info("Finished pulling from " + context.getDateTimeFrom() + " to " + context.getDateTimeTo());
+					log.debug("Finished pulling from " + context.getDateTimeFrom() + " to " + context.getDateTimeTo());
 					stop();
 					break;
 				}
 				// otherwise wait and attempt to pull from the latest offset
 				// value
 				else {
-					log.info("Pulling new data in " + (context.getInterval() / 1000L) + " sec");
+					log.debug("Pulling new data in " + (context.getInterval() / 1000L) + " sec");
 				}
 				synchronized (this) {
 					try {
@@ -245,16 +251,16 @@ public class CEFConnectorApp {
 					}
 				}
 				// once the wait time is complete, attempt to pull from offset
-				log.info("Pulling new data...");
-				log.info("______________________________________________________");
+				log.debug("Pulling new data...");
+				log.debug("______________________________________________________");
 			}
 		}
-		log.info("*** CEF Connector stopped ***");
+		log.debug("*** CEF Connector stopped ***");
 
 	}
 
 	public void stop() {
-		log.info("*** Stopping CEF Connector ***");
+		log.debug("*** Stopping CEF Connector ***");
 		stopped = true;
 		synchronized (this) {
 			this.notify();
@@ -279,10 +285,11 @@ public class CEFConnectorApp {
 		}
 		return true;
 	}
-	
-	private void printStatistic(EventProducer producer) {
-		log.error("producer produces record count: " + producer.getProcessedRecord());
-		
+
+	private void printStatistic(EventProducer producer, CEFContext context) {
+
+		log.info("Total record count: " + producer.getProcessedRecord());
+		log.info(context.toString());
 	}
 
 }
