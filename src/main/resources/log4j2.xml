@@ -77,14 +77,6 @@
         <RollingFile name="file-log-error" fileName="${log-path}/${log-name}-error.log"
         filePattern="${log-path}/${log-name}-error-%d{yyyy-MM-dd}-%i.log">
             <PatternLayout pattern="${logPattern-FileError}"/>
-            <Filters>
-
-            <!-- First deny warn, error and fatal messages -->
-            <ThresholdFilter level="syslog"  onMatch="DENY" onMismatch="NEUTRAL"/>
-
-            <!-- Then accept info, warn, error, fatal and deny debug/trace -->
-            <ThresholdFilter level="error"  onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
             <Policies>
                 <SizeBasedTriggeringPolicy size="${SizeBasedTriggeringPolicy}" />
             </Policies>
@@ -105,7 +97,7 @@
 	        <appender-ref ref="file-log-warn" level="warn"/>
 	        <appender-ref ref="cefsyslog" level="syslog"/>
 	        -->  
-			<appender-ref ref="file-log-error" level="error" />
+			<appender-ref ref="file-log-error" />
 		</Root>
 		<Logger name="cefsyslog" additivity="false">
 			<AppenderRef ref="cefsyslog" level="SYSLOG" />
