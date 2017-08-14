@@ -4,8 +4,17 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>CEFConnector</groupId>
 	<artifactId>CEFConnector</artifactId>
-	<version>1.4</version>
+	<version>1.5.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
+	<repositories>
+		<repository>
+			<id>mvn-akamai</id>
+			<url>https://lunabuild.akamai.com/nexus/content/groups/public/</url>
+			<snapshots>
+				<updatePolicy>interval:10</updatePolicy>
+			</snapshots>
+		</repository>
+	</repositories>	
 	<dependencies>
 		<dependency>
 			<groupId>com.lmax</groupId>
