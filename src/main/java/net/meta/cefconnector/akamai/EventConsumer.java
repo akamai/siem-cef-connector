@@ -29,7 +29,7 @@ public class EventConsumer implements Runnable {
 		long start = System.currentTimeMillis();
 		while (!done) {
 			try {
-				Message message = queue.poll(10, TimeUnit.MILLISECONDS);
+				Message message = queue.poll(5, TimeUnit.MILLISECONDS);
 				if (message != null) {
 					if (message.isToken()) {
 						try {

@@ -23,9 +23,66 @@ import net.meta.cefconnector.config.CEFContext;
 public class CEFLogger {
 
 	private static final Logger log = LogManager.getLogger(CEFLogger.class);
+
+	// Refactoring -- Could be a constant file
+	private static final String UTF_8_ENCODING = "UTF-8";
+	private static final String EVENT_CLASS_ID = "eventClassId";
+	private static final String SEVERITY = "severity";
+	private static final String NAME = "name";
+	private static final String APPLIED_ACTION = "appliedAction";
+	private static final String REQUEST_URL = "requestURL";
+	private static final String IPV6_SRC = "ipv6src";
+
+	private static final String OFFSET = "offset";
+	private static final String ALERT = "alert";
+	private static final String MONITOR = "monitor";
+	private static final String DETECT = "detect";
+	private static final String MITIGATE = "mitigate";
+	private static final String ABORT = "abort";
+	private static final String DENY = "deny";
+
+	private static final String ATTACK_DATA = "attackData";
+	private static final String RULE_ACTIONS = "ruleActions";
+	private static final String SEMI_COLON = ";";
+	private static final String SLOWPOST_ACTION = "slowPostAction";
+	private static final String SLOWPOST_ACTION_A = "A";
+
+	private static final String HTTP_MESSAGE = "httpMessage";
+	private static final String TLS = "tls";
+	private static final String HOST = "host";
+	private static final String SCHEME = "https://%s";
+	private static final String PATH = "path";
+	private static final String QUERY = "query";
+
 	private static final Pattern API = Pattern.compile("\\$\\{([^}]+)\\}");
 	private static final Pattern Static = Pattern.compile(".*\\\"(.*)\\\".*");
 	private static final Pattern Calculated = Pattern.compile("([^}]+)\\(\\)");
+
+	private static final String CEF_HEADER = "CEFHeader";
+
+	private static final String EMPTY_STRING = "";
+	private static final String END_LINE = "\n";
+	private static final String EQUAL = "=";
+	private static final String SPACE = " ";
+
+	private static final String REGEX_SPACE = "\\s+$";
+	private static final String REGEX_1 = "(?=[=\"\\\\])";
+	private static final String REGEX_2 = "(\\r|\\n|\\r\\n)+";
+	private static final String REGEX_DOT = "\\.";
+	private static final String REGEX_DBL_QUOTE = "\"";
+
+	private static final String BACLSLASH_ENDLINE = "\\\\n";
+	private static final String BACLSLASHES = "\\\\";
+
+	private static final String DEL_DBLQUT_COLN_COMA_SPC = "\":, ";
+	private static final String BACKSLASH_DBL_QUOTE = "\\\"";
+	private static final String BACKSLASH_EQUAL = "\\=";
+
+	private static final String ACTIVITY_DETECTED = "Activity detected";
+	private static final String ACTIVITY_MITIGATED = "Activity mitigated";
+
+	private static final String DOL_ATTACKDATA = "$attackData";
+	private static final String CLIENT_IP = "clientIP";
 	/*
 	 * Description: This function will take responseData string and convert it
 	 * to CEF format. If successful, it will return the offset token Arguments:
@@ -42,9 +99,11 @@ public class CEFLogger {
 
 		// parse the response data string by newlines into individual
 		// JSONObjects
-		StringTokenizer st = new StringTokenizer(responseData, "\n", false);
+		StringTokenizer st = new StringTokenizer(responseData, END_LINE, false);
 		int tokenCount = st.countTokens();
-		log.info(String.format("Successfully received %d response lines of data", tokenCount));
+		if (log.isInfoEnabled()) {
+			log.info(String.format("Successfully received %d response lines of data", tokenCount));
+		}
 
 		String line = null;
 		String token = null;
@@ -74,7 +133,7 @@ public class CEFLogger {
 				params = prepareParams(null, new JSONObject(line));
 
 				StringBuilder logLine = new StringBuilder();
-				String logLineHeader = "";
+				String logLineHeader = EMPTY_STRING;
 
 				// loop through the map one by one and retrieve the key/value
 				// maps individually
@@ -84,19 +143,19 @@ public class CEFLogger {
 
 					// If the key equals CEFHeader than this value contains the
 					// full CEF Header
-					if ((!val.equals("")) && ((entry.getKey().equals("CEFHeader")))) {
+					if ((!val.equals(EMPTY_STRING)) && ((entry.getKey().equals(CEF_HEADER)))) {
 						logLineHeader = val;
 					}
 					// Otherwise the key contains the cef tag and the value
 					// contains the value for the cef tag
-					else if ((!val.equals(""))) {
-						logLine.append(entry.getKey() + "=" + val + " ");
+					else if ((!val.equals(EMPTY_STRING))) {
+						logLine.append(entry.getKey() + EQUAL + val + SPACE);
 					}
 				}
 
 				// Send the full CEF Header and CEF extension message to be
 				// logged to the SIEM. Remove any trailing spaces.
-				LogSaver.save((logLineHeader + logLine.toString()).replaceAll("\\s+$", ""));
+				LogSaver.save((logLineHeader + logLine.toString()).replaceAll(REGEX_SPACE, EMPTY_STRING));
 			} // if the current responseData newline is not a proper JSONObject,
 				// skip and log to error
 			catch (JSONException e) {
@@ -111,12 +170,12 @@ public class CEFLogger {
 		line = st.nextToken();
 		if (line != null) {
 			// parse the json object using stringtokenizer
-			st = new StringTokenizer(line, "\":, ", false);
+			st = new StringTokenizer(line, DEL_DBLQUT_COLN_COMA_SPC, false);
 			while (st.hasMoreTokens()) {
 				line = st.nextToken();
 
 				// find the json value for offset
-				if ("offset".equals(line)) {
+				if (OFFSET.equals(line)) {
 					token = st.nextToken();
 				}
 			}
@@ -157,10 +216,10 @@ public class CEFLogger {
 		for (int ctrl = 0; (CEFFormatExtensionArray != null && ctrl < CEFFormatExtensionArray.length); ctrl++) {
 
 			String extension = CEFFormatExtensionArray[ctrl];
-			String[] extensionPair = extension.split("=");
+			String[] extensionPair = extension.split(EQUAL);
 			String CEFParam = extensionPair[0];
 			String AkamaiParamRaw = extensionPair[1];
-			String AkamaiParam = "";
+			String AkamaiParam = EMPTY_STRING;
 
 			// Determine if Akamai Value is Static or API based
 
@@ -176,18 +235,18 @@ public class CEFLogger {
 			{
 				String function = mCalculated.group(1); // function name
 
-				AkamaiParam = calculatedFunction(rec, function).replaceAll("(?=[=\"\\\\])", "\\\\");
-				AkamaiParam = AkamaiParam.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");
+				AkamaiParam = calculatedFunction(rec, function).replaceAll(REGEX_1, BACLSLASHES);
+				AkamaiParam = AkamaiParam.replaceAll(REGEX_2, BACLSLASH_ENDLINE);
 			} else if (mAPI.find()) // Dynamic Akamai API variable defined by
 									// ${}. Need to find Value
 			{
 				try {
 
 					JSONObject tempObject = null;
-					String[] paramDefinition = mAPI.group(1).split("\\."); // separate
-																			// API
-																			// Variable
-																			// constructs
+					String[] paramDefinition = mAPI.group(1).split(REGEX_DOT); // separate
+																				// API
+																				// Variable
+																				// constructs
 					for (int ctrl2 = 0; ctrl2 < (paramDefinition.length - 1); ctrl2++) {
 						if (ctrl2 == 0) {
 							if (rec.has(paramDefinition[ctrl2])) {
@@ -200,7 +259,7 @@ public class CEFLogger {
 						}
 					}
 
-					String valueClean = "";
+					String valueClean = EMPTY_STRING;
 					if (tempObject != null && tempObject.has(paramDefinition[paramDefinition.length - 1])) {
 						valueClean = tempObject.getString(paramDefinition[paramDefinition.length - 1]);
 					}
@@ -210,20 +269,20 @@ public class CEFLogger {
 					}
 					// is it base64 encoded
 					if (base64Check(AkamaiParamRaw, base64Fields)) {
-						AkamaiParam = "";
+						AkamaiParam = EMPTY_STRING;
 						try {
 							if (tempObject != null && tempObject.has(paramDefinition[paramDefinition.length - 1])) {
 
-								String[] temp = valueClean.split(";");
+								String[] temp = valueClean.split(SEMI_COLON);
 								for (int ctrl3 = 0; ctrl3 < temp.length; ctrl3++) {
 
-									String decoded = base64Decode(temp[ctrl3]).replaceAll("(?=[=\"\\\\])", "\\\\");
+									String decoded = base64Decode(temp[ctrl3]).replaceAll(REGEX_1, BACLSLASHES);
 
 									if (ctrl3 == 0)
-										AkamaiParam = decoded.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");
+										AkamaiParam = decoded.replaceAll(REGEX_2, BACLSLASH_ENDLINE);
 									else
-										AkamaiParam = AkamaiParam + delim.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n")
-												+ decoded.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");
+										AkamaiParam = AkamaiParam + delim.replaceAll(REGEX_2, BACLSLASH_ENDLINE)
+												+ decoded.replaceAll(REGEX_2, BACLSLASH_ENDLINE);
 								}
 							}
 						} catch (Exception exception) {
@@ -231,8 +290,8 @@ public class CEFLogger {
 						}
 					} else {
 						if (tempObject != null && tempObject.has(paramDefinition[paramDefinition.length - 1]))
-							AkamaiParam = valueClean.replaceAll("(?=[=\"\\\\])", "\\\\");
-						AkamaiParam = AkamaiParam.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");
+							AkamaiParam = valueClean.replaceAll(REGEX_1, BACLSLASHES);
+						AkamaiParam = AkamaiParam.replaceAll(REGEX_2, BACLSLASH_ENDLINE);
 					}
 				} catch (org.json.JSONException exception) {
 					log.error("Invalid API format:" + exception);
@@ -241,7 +300,8 @@ public class CEFLogger {
 										// Properties. Needs to be between
 										// double quotes
 			{
-				AkamaiParam = mStatic.group(1).split("\"")[0].replaceAll("\"", "\\\"").replaceAll("=", "\\=");
+				AkamaiParam = mStatic.group(1).split(REGEX_DBL_QUOTE)[0]
+						.replaceAll(REGEX_DBL_QUOTE, BACKSLASH_DBL_QUOTE).replaceAll(EQUAL, BACKSLASH_EQUAL);
 			}
 
 			params.put(CEFParam, AkamaiParam);
@@ -252,7 +312,7 @@ public class CEFLogger {
 		 * Product|Device Version|Device Event Class
 		 * ID|Name|Severity|[Extension]
 		 */
-		String CEFheader = "";
+		String CEFheader = EMPTY_STRING;
 		for (int ctrl = 0; ctrl < CEFFormatHeaderArray.length; ctrl++) {
 
 			// Determine if Akamai Value is Static or Calculated based
@@ -262,11 +322,11 @@ public class CEFLogger {
 									// $. Need to find Value
 			{
 				String function = mCalculated.group(1); // function name
-				String tempString = "";
+				String tempString = EMPTY_STRING;
 
 				tempString = calculatedFunction(rec, function);
 
-				if (!(tempString.equals("")))
+				if (!(tempString.equals(EMPTY_STRING)))
 					;
 				CEFheader = String.format("%s%s|", CEFheader, tempString);
 			} else // Pull Static Value Defined in Properties. Needs to be
@@ -276,7 +336,7 @@ public class CEFLogger {
 			}
 		}
 		// add header
-		params.put("CEFHeader", CEFheader);
+		params.put(CEF_HEADER, CEFheader);
 
 		return params;
 	}
@@ -287,7 +347,7 @@ public class CEFLogger {
 	 */
 	private String URLDecoder(String URLEncoded) {
 		try {
-			String URLDecoded = java.net.URLDecoder.decode(URLEncoded, "UTF-8");
+			String URLDecoded = java.net.URLDecoder.decode(URLEncoded, UTF_8_ENCODING);
 			return URLDecoded;
 		} catch (java.io.UnsupportedEncodingException e) {
 			throw new AssertionError("UTF-8 is unknown");
@@ -364,12 +424,12 @@ public class CEFLogger {
 	 */
 	private String appliedAction(JSONObject rec) {
 		String ruleActions = "";
-		if (rec.has("attackData") && rec.getJSONObject("attackData").has("ruleActions"))
-			ruleActions = rec.getJSONObject("attackData").getString("ruleActions");
-		String pAction = "";
-		String decoded = "";
+		if (rec.has(ATTACK_DATA) && rec.getJSONObject(ATTACK_DATA).has(RULE_ACTIONS))
+			ruleActions = rec.getJSONObject(ATTACK_DATA).getString(RULE_ACTIONS);
+		String pAction = EMPTY_STRING;
+		String decoded = EMPTY_STRING;
 		try {
-			String[] temp = URLDecoder(ruleActions).split(";");
+			String[] temp = URLDecoder(ruleActions).split(SEMI_COLON);
 			for (int ctrl = 0; ctrl < temp.length; ctrl++) {
 				if (ctrl == 0)
 					decoded = base64Decode(temp[ctrl]);
@@ -380,15 +440,15 @@ public class CEFLogger {
 			log.error(exception);
 		}
 
-		if ((!decoded.contains("alert")) && !(decoded.contains("deny"))) {
+		if ((!decoded.contains(ALERT)) && !(decoded.contains(DENY))) {
 			pAction = decoded;
-		} else if (decoded.contains("deny"))
-			pAction = "deny";
-		else if (rec.has("attackData") && rec.getJSONObject("attackData").has("slowPostAction")
-				&& rec.getJSONObject("attackData").getString("slowPostAction").equals("A"))
-			pAction = "abort";
+		} else if (decoded.contains(DENY))
+			pAction = DENY;
+		else if (rec.has(ATTACK_DATA) && rec.getJSONObject(ATTACK_DATA).has(SLOWPOST_ACTION)
+				&& rec.getJSONObject(ATTACK_DATA).getString(SLOWPOST_ACTION).equals(SLOWPOST_ACTION_A))
+			pAction = ABORT;
 		else
-			pAction = "alert";
+			pAction = ALERT;
 
 		if (pAction.equals(""))
 			log.error("Invalid pAction Calculated");
@@ -403,10 +463,10 @@ public class CEFLogger {
 	private String eventClassId(JSONObject rec) {
 		String pAction = appliedAction(rec);
 
-		if (pAction.equalsIgnoreCase("alert") || pAction.equalsIgnoreCase("monitor"))
-			return "detect";
+		if (ALERT.equalsIgnoreCase(pAction) || MONITOR.equalsIgnoreCase(pAction))
+			return DETECT;
 		else
-			return "mitigate";
+			return MITIGATE;
 	}
 
 	/*
@@ -414,22 +474,22 @@ public class CEFLogger {
 	 * httpMessage and path Arguments: JSONObject rec Return: String
 	 */
 	private String requestURL(JSONObject rec) {
-		String requestURL = "";
+		String requestURL = EMPTY_STRING;
 
-		if (rec != null && rec.has("httpMessage") && rec.getJSONObject("httpMessage").has("tls")) {
-			if (rec.getJSONObject("httpMessage").has("host"))
-				requestURL = String.format("https://%s", rec.getJSONObject("httpMessage").getString("host"));
+		if (rec != null && rec.has(HTTP_MESSAGE) && rec.getJSONObject(HTTP_MESSAGE).has(TLS)) {
+			if (rec.getJSONObject(HTTP_MESSAGE).has(HOST))
+				requestURL = String.format(SCHEME, rec.getJSONObject(HTTP_MESSAGE).getString(HOST));
 		} else {
-			if (rec.getJSONObject("httpMessage").has("host"))
-				requestURL = String.format("http://%s", rec.getJSONObject("httpMessage").getString("host"));
+			if (rec.getJSONObject(HTTP_MESSAGE).has(HOST))
+				requestURL = String.format(SCHEME, rec.getJSONObject(HTTP_MESSAGE).getString(HOST));
 		}
 
-		if (rec != null && rec.has("httpMessage") && rec.getJSONObject("httpMessage").has("path")) {
-			requestURL = String.format("%s%s", requestURL, rec.getJSONObject("httpMessage").getString("path"));
+		if (rec != null && rec.has(HTTP_MESSAGE) && rec.getJSONObject(HTTP_MESSAGE).has(PATH)) {
+			requestURL = String.format("%s%s", requestURL, rec.getJSONObject(HTTP_MESSAGE).getString(PATH));
 		}
 
-		if (rec != null && rec.has("httpMessage") && rec.getJSONObject("httpMessage").has("query")) {
-			requestURL = String.format("%s?%s", requestURL, rec.getJSONObject("httpMessage").getString("query"));
+		if (rec != null && rec.has(HTTP_MESSAGE) && rec.getJSONObject(HTTP_MESSAGE).has(QUERY)) {
+			requestURL = String.format("%s?%s", requestURL, rec.getJSONObject(HTTP_MESSAGE).getString(QUERY));
 		}
 		return requestURL;
 	}
@@ -441,10 +501,10 @@ public class CEFLogger {
 	private String name(JSONObject rec) {
 		String eventClassId = eventClassId(rec);
 
-		if (eventClassId.equals("detect"))
-			return "Activity detected";
+		if (eventClassId.equals(DETECT))
+			return ACTIVITY_DETECTED;
 		else
-			return "Activity mitigated";
+			return ACTIVITY_MITIGATED;
 	}
 
 	/*
@@ -454,7 +514,7 @@ public class CEFLogger {
 	private String severity(JSONObject rec) {
 		String eventClassId = eventClassId(rec);
 
-		if (eventClassId.equals("detect"))
+		if (eventClassId.equals(DETECT))
 			return "5";
 		else
 			return "10";
@@ -465,14 +525,14 @@ public class CEFLogger {
 	 * it's in the correct format. Arguments: JSONObject rec Return: String
 	 */
 	private String ipv6src(JSONObject rec) {
-		if (rec != null && rec.has("$attackData") && rec.getJSONObject("$attackData").has("clientIP")) {
-			String ipv6src = rec.getJSONObject("$attackData").getString("clientIP");
+		if (rec != null && rec.has(DOL_ATTACKDATA) && rec.getJSONObject(DOL_ATTACKDATA).has(CLIENT_IP)) {
+			String ipv6src = rec.getJSONObject(DOL_ATTACKDATA).getString(CLIENT_IP);
 			if (InetAddressUtils.isIPv6Address(ipv6src))
 				return ipv6src;
 			else
-				return "";
+				return EMPTY_STRING;
 		} else {
-			return "";
+			return EMPTY_STRING;
 		}
 	}
 
@@ -483,19 +543,19 @@ public class CEFLogger {
 	 */
 	private String calculatedFunction(JSONObject rec, String function) {
 
-		String tempString = "";
+		String tempString = EMPTY_STRING;
 
-		if (function.equals("eventClassId")) {
+		if (EVENT_CLASS_ID.equals(function)) {
 			tempString = eventClassId(rec);
-		} else if (function.equals("severity")) {
+		} else if (SEVERITY.equals(function)) {
 			tempString = severity(rec);
-		} else if (function.equals("name")) {
+		} else if (NAME.equals(function)) {
 			tempString = name(rec);
-		} else if (function.equals("appliedAction")) {
+		} else if (APPLIED_ACTION.equals(function)) {
 			tempString = appliedAction(rec);
-		} else if (function.equals("requestURL")) {
+		} else if (REQUEST_URL.equals(function)) {
 			tempString = requestURL(rec);
-		} else if (function.equals("ipv6src")) {
+		} else if (IPV6_SRC.equals(function)) {
 			tempString = ipv6src(rec);
 		} else {
 			log.error("Invalid Function: " + function);
@@ -522,7 +582,7 @@ public class CEFLogger {
 			params = prepareParams(context, new JSONObject(line));
 
 			StringBuilder logLine = new StringBuilder();
-			String logLineHeader = "";
+			String logLineHeader = EMPTY_STRING;
 
 			// loop through the map one by one and retrieve the key/value maps
 			// individually
@@ -532,19 +592,19 @@ public class CEFLogger {
 
 				// If the key equals CEFHeader than this value contains the full
 				// CEF Header
-				if ((!val.equals("")) && ((entry.getKey().equals("CEFHeader")))) {
+				if ((!val.equals(EMPTY_STRING)) && ((entry.getKey().equals(CEF_HEADER)))) {
 					logLineHeader = val;
 				}
 				// Otherwise the key contains the cef tag and the value contains
 				// the value for the cef tag
-				else if ((!val.equals(""))) {
-					logLine.append(entry.getKey() + "=" + val + " ");
+				else if ((!val.equals(EMPTY_STRING))) {
+					logLine.append(entry.getKey() + EQUAL + val + SPACE);
 				}
 			}
 
 			// Send the full CEF Header and CEF extension message to be logged
 			// to the SIEM. Remove any trailing spaces.
-			LogSaver.save((logLineHeader + logLine.toString()).replaceAll("\\s+$", ""));
+			LogSaver.save((logLineHeader + logLine.toString()).replaceAll(REGEX_SPACE, EMPTY_STRING));
 		} // if the current responseData newline is not a proper JSONObject,
 			// skip and log to error
 		catch (Exception e) {
@@ -556,12 +616,12 @@ public class CEFLogger {
 		String token = null;
 
 		// parse the json object using stringtokenizer
-		StringTokenizer st = new StringTokenizer(line, "\":, ", false);
+		StringTokenizer st = new StringTokenizer(line, DEL_DBLQUT_COLN_COMA_SPC, false);
 		while (st.hasMoreTokens()) {
 			line = st.nextToken();
 
 			// find the json value for offset
-			if ("offset".equals(line)) {
+			if (OFFSET.equals(line)) {
 				token = st.nextToken();
 			}
 		}
