@@ -4,7 +4,10 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ResourceBundle;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
@@ -54,6 +57,7 @@ public class CEFConnectorApp {
 
 		CEFConnectorConfiguration.setBundle(ResourceBundle.getBundle(CEFLogger));
 		context.setInterval(CEFConnectorConfiguration.getRefreshPeriod());
+		context.setConsumerCount(CEFConnectorConfiguration.getConsumerCount());
 
 		// Offset or Timebased?
 		String dataTimeBased = CEFConnectorConfiguration.getDataTimeBased();
@@ -135,17 +139,16 @@ public class CEFConnectorApp {
 				log.debug("Open Api Status Code " + statusCode);
 				// Successful http response, attempt to process
 				if (statusCode == 200) {
+
 					BlockingQueue<Message> queue = new LinkedBlockingQueue<Message>(1024 * 256);
 					EventConsumer consumerTask = new EventConsumer(context, cefLogger, queue);
 					EventProducer producer = new EventProducer(queue);
-					Thread consumer1 = new Thread(consumerTask);
-					Thread consumer2 = new Thread(consumerTask);
-					Thread consumer3 = new Thread(consumerTask);
 
-					consumer1.start();
-					consumer2.start();
-					consumer3.start();
-
+					ExecutorService executor = Executors.newFixedThreadPool(context.getConsumerCount());
+					for (int i = 0; i < context.getConsumerCount(); i++) {
+						Runnable worker = new Thread(consumerTask);
+						executor.execute(worker);
+					}
 					try (BufferedReader is = new BufferedReader(
 							new InputStreamReader(response.getEntity().getContent()), 1024 * 32)) {
 						String previousLine = is.readLine();
@@ -166,18 +169,17 @@ public class CEFConnectorApp {
 							} while (line != null);
 						}
 					}
-					// If request was time based and successful, use token
-					// next
 
 					// reset ctrl
 					retryCtrl = 0;
-					consumer1.join();
-					consumer2.join();
-					consumer3.join();
-					
+					executor.shutdown();
+					while (!executor.isTerminated()) {
+						TimeUnit.MILLISECONDS.sleep(50);
+					}
 
 					printStatistic(producer, context);
-					
+					// If request was time based and successful, use token
+					// next
 					if (!context.isOffsetMode())
 						context.setOffsetMode(true);
 					// unsuccessful http response, log error
@@ -186,7 +188,7 @@ public class CEFConnectorApp {
 					log.error(context.toString());
 					log.error("Open Api Status Code " + statusCode);
 					String responseData = EntityUtils.toString(response.getEntity());
-					
+
 					// If the error response is in json format (expected if
 					// the correct http endpoint was reached) then log the
 					// response to error

@@ -16,6 +16,7 @@ public class CEFConnectorConfiguration {
 
     private static final String REFRESH_PERIOD = "connector.refresh.period";
     private static final String TIMEZONE = "connector.timezone";
+    private static final String CONSUMER_COUNT = "connector.consumer.count";
 
     private static final long DEFAULT_REFRESH_PERIOD = 60;
     private static final String DEFAULT_TIMEZONE = "UTC";
@@ -462,6 +463,22 @@ public class CEFConnectorConfiguration {
             throw new IllegalArgumentException(message);
         }  
     }
+    
+    
+	public static int getConsumerCount() {
+
+		int count = 3;
+		try {
+			String value = bundle.getString(CONSUMER_COUNT);
+			if (value != null && !value.isEmpty()) {
+				return Integer.parseInt(value);
+			}
+		} catch (Exception exception) {
+            log.warn("Error parsing Consumer Count Property, starting with default count "+ count);
+		}
+		
+		return count;
+	}
     /**
      * Sets bundle or mock bundle
      *
