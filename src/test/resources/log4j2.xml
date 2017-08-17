@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="info">
+<Configuration status="warn">
     <Properties>
         <!--
         File Log Configuration 1.4
@@ -11,7 +11,7 @@
         -->
         <Property name="log-path">logs</Property>
         <Property name="log-name">cefconnector</Property>
-        <Property name="SizeBasedTriggeringPolicy">1 MB</Property>
+        <Property name="SizeBasedTriggeringPolicy">100 MB</Property>
         <Property name="DefaultRolloverStrategy">20</Property>
         <!--
         CEF Syslog Configuration
@@ -39,27 +39,11 @@
         <Property name="logPattern-FileError">[%-5level] %d [%t] %c:%M:%L- %m%n</Property>
     </Properties>
     <CustomLevels>
-        <CustomLevel name="SYSLOG" intLevel="1" />
+        <CustomLevel name="SYSLOG" intLevel="50" />
     </CustomLevels>
     <Appenders>
-        <RollingFile name="file-log-info" fileName="${log-path}/${log-name}-info.log"
-        filePattern="${log-path}/${log-name}-info-%d{yyyy-MM-dd}-%i.log">
-            <PatternLayout pattern="${logPattern-FileInfo}"/>
-            <Policies>
-                <SizeBasedTriggeringPolicy size="${SizeBasedTriggeringPolicy}" />
-            </Policies>
-            <DefaultRolloverStrategy max="${DefaultRolloverStrategy}"/>
-        </RollingFile>
-        <RollingFile name="file-log-warn" fileName="${log-path}/${log-name}-warn.log"
-        filePattern="${log-path}/${log-name}-warn-%d{yyyy-MM-dd}-%i.log">
-            <PatternLayout pattern="${logPattern-FileWarn}"/>
-            <Policies>
-                <SizeBasedTriggeringPolicy size="${SizeBasedTriggeringPolicy}" />
-            </Policies>
-            <DefaultRolloverStrategy max="${DefaultRolloverStrategy}"/>
-        </RollingFile>
-        <RollingFile name="file-log-error" fileName="${log-path}/${log-name}-error.log"
-        filePattern="${log-path}/${log-name}-error-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="file-log-error" fileName="${log-path}/${log-name}.log"
+        filePattern="${log-path}/${log-name}-%d{yyyy-MM-dd}-%i.log">
             <PatternLayout pattern="${logPattern-FileError}"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="${SizeBasedTriggeringPolicy}" />
@@ -73,13 +57,15 @@
             <PatternLayout pattern="${logPattern-CEF}"/>
         </Socket>
     </Appenders>
-    <Loggers>
-    <Root level="info" additivity="false">
-        <appender-ref ref="console"/>
-        <appender-ref ref="file-log-info" level="info"/>
-        <appender-ref ref="file-log-warn" level="warn"/>
-        <appender-ref ref="file-log-error" level="error"/>
-        <appender-ref ref="cefsyslog" level="syslog"/>
-    </Root>
-</Loggers>
+	<Loggers>
+		<Root level="info" additivity="false">
+	    	<!-- 
+	        <appender-ref ref="console"/>
+	        -->  
+			<appender-ref ref="file-log-error" />
+		</Root>
+		<Logger name="cefsyslog" additivity="false">
+			<AppenderRef ref="cefsyslog" level="SYSLOG" />
+		</Logger>
+	</Loggers>
 </Configuration>
