@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="info">
+<Configuration status="warn">
     <Properties>
         <!--
         File Log Configuration 1.4
@@ -42,40 +42,8 @@
         <CustomLevel name="SYSLOG" intLevel="50" />
     </CustomLevels>
     <Appenders>
-        <RollingFile name="file-log-info" fileName="${log-path}/${log-name}-info.log"
-        filePattern="${log-path}/${log-name}-info-%d{yyyy-MM-dd}-%i.log">
-            <PatternLayout pattern="${logPattern-FileInfo}"/>
-            <Filters>
-
-            <!-- First deny warn, error and fatal messages -->
-            <ThresholdFilter level="warn"  onMatch="DENY" onMismatch="NEUTRAL"/>
-
-            <!-- Then accept info, warn, error, fatal and deny debug/trace -->
-            <ThresholdFilter level="info"  onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
-            <Policies>
-                <SizeBasedTriggeringPolicy size="${SizeBasedTriggeringPolicy}" />
-            </Policies>
-            <DefaultRolloverStrategy max="${DefaultRolloverStrategy}"/>
-        </RollingFile>
-        <RollingFile name="file-log-warn" fileName="${log-path}/${log-name}-warn.log"
-        filePattern="${log-path}/${log-name}-warn-%d{yyyy-MM-dd}-%i.log">
-            <PatternLayout pattern="${logPattern-FileWarn}"/>
-            <Filters>
-
-            <!-- First deny error and fatal messages -->
-            <ThresholdFilter level="error"  onMatch="DENY" onMismatch="NEUTRAL"/>
-
-            <!-- Then accept  warn -->
-            <ThresholdFilter level="warn"  onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
-            <Policies>
-                <SizeBasedTriggeringPolicy size="${SizeBasedTriggeringPolicy}" />
-            </Policies>
-            <DefaultRolloverStrategy max="${DefaultRolloverStrategy}"/>
-        </RollingFile>
-        <RollingFile name="file-log-error" fileName="${log-path}/${log-name}-error.log"
-        filePattern="${log-path}/${log-name}-error-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="file-log-error" fileName="${log-path}/${log-name}.log"
+        filePattern="${log-path}/${log-name}-%d{yyyy-MM-dd}-%i.log">
             <PatternLayout pattern="${logPattern-FileError}"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="${SizeBasedTriggeringPolicy}" />
@@ -90,12 +58,9 @@
         </Socket>
     </Appenders>
 	<Loggers>
-		<Root level="error" additivity="false">
+		<Root level="info" additivity="false">
 	    	<!-- 
 	        <appender-ref ref="console"/>
-	        <appender-ref ref="file-log-info" level="info"/>
-	        <appender-ref ref="file-log-warn" level="warn"/>
-	        <appender-ref ref="cefsyslog" level="syslog"/>
 	        -->  
 			<appender-ref ref="file-log-error" />
 		</Root>

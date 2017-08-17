@@ -276,7 +276,7 @@ public class CEFLogger {
 								String[] temp = valueClean.split(SEMI_COLON);
 								for (int ctrl3 = 0; ctrl3 < temp.length; ctrl3++) {
 
-									String decoded = base64Decode(temp[ctrl3]).replaceAll(REGEX_1, BACLSLASHES);
+									String decoded = base64Decode(rec, temp[ctrl3]).replaceAll(REGEX_1, BACLSLASHES);
 
 									if (ctrl3 == 0)
 										AkamaiParam = decoded.replaceAll(REGEX_2, BACLSLASH_ENDLINE);
@@ -384,7 +384,7 @@ public class CEFLogger {
 	 * Description: base64decode the current base64encoded string Arguments:
 	 * String value Return: String
 	 */
-	private String base64Decode(String value) {
+	private String base64Decode(JSONObject rec, String value) {
 		// attempt to base64decode string
 		try {
 			byte[] decodedValue = Base64.getDecoder().decode(value); // Basic
@@ -395,6 +395,7 @@ public class CEFLogger {
 		// the current string is not a valid base64encoded string. Log to warn
 		// and return original value
 		catch (IllegalArgumentException exception) {
+			log.warn("Input Event Meassage :" + rec.toString());
 			log.warn("Base64 field has invalid characters: \"" + value + "\". Please verify the field is URL decoded.");
 			return value;
 		}
@@ -432,9 +433,9 @@ public class CEFLogger {
 			String[] temp = URLDecoder(ruleActions).split(SEMI_COLON);
 			for (int ctrl = 0; ctrl < temp.length; ctrl++) {
 				if (ctrl == 0)
-					decoded = base64Decode(temp[ctrl]);
+					decoded = base64Decode(rec, temp[ctrl]);
 				else
-					decoded = String.format("%s %s", decoded, base64Decode(temp[ctrl]));
+					decoded = String.format("%s %s", decoded, base64Decode(rec, temp[ctrl]));
 			}
 		} catch (Exception exception) {
 			log.error(exception);
