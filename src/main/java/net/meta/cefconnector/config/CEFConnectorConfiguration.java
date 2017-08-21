@@ -40,8 +40,6 @@ public class CEFConnectorConfiguration {
 
     private static final String RETRY_MAX = "connector.retry";
     
-    private static final String DEBUG_MODE = "connector.debug";
-    
     /*
     private static final String AKAMAI_SEVERITY_WARNING = "akamai.severity.warning";
     private static final String AKAMAI_SEVERITY_INFORMATIONAL = "akamai.severity.informational";
@@ -84,17 +82,6 @@ public class CEFConnectorConfiguration {
             return value;
         } catch (java.util.MissingResourceException e) {
             return ",";
-        } catch (Exception e) {
-            String message = "Unexpected Error: "+e+".";
-            throw new IllegalArgumentException(message);
-        }    
-    }
-    public static String getConnectorDebug() {
-        try {
-            String value = bundle.getString(DEBUG_MODE);
-            return value;
-        } catch (java.util.MissingResourceException e) {
-            return "false";
         } catch (Exception e) {
             String message = "Unexpected Error: "+e+".";
             throw new IllegalArgumentException(message);
@@ -216,7 +203,7 @@ public class CEFConnectorConfiguration {
                 return value;
             }
             else if((!valueTo.equals("")) && (Long.parseLong(valueTo)<=Long.parseLong(value))){
-                String message = "The configuration parameter "+AKAMAI_DATA_TIMEBASED_FROM+" with value "+Long.parseLong(value)+" needs to be greater than "+AKAMAI_DATA_TIMEBASED_TO+" with value "+Long.parseLong(valueTo)+".";
+                String message = "The configuration parameter "+AKAMAI_DATA_TIMEBASED_FROM+" with value "+Long.parseLong(value)+" needs to be less than "+AKAMAI_DATA_TIMEBASED_TO+" with value "+Long.parseLong(valueTo)+".";
                 throw new IllegalArgumentException(message);
             }
             else{
