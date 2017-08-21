@@ -23,8 +23,9 @@ public class LogSaver {
 	 */
 	static void save(String message) {
 		// Writing Event to Socket Appender
-		// log.log(Level.forName("syslog", 50), message);
-		LogManager.getLogger("cefsyslog").log(Level.getLevel("syslog"), message);
+		// Below line is an error, change it to uppercase SYSLOG
+		//LogManager.getLogger("cefsyslog").log(Level.getLevel("syslog"), message);
+		LogManager.getLogger("cefsyslog").log(Level.getLevel("SYSLOG"), message);
 		if (log.isDebugEnabled()) {
 			log.debug(message);
 		}
