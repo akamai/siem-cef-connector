@@ -88,14 +88,6 @@ public class CEFConnectorApp {
 		// retrieve data limit if set
 		context.setDataLimit(CEFConnectorConfiguration.getDataLimit());
 
-		// Is debug mode on or off?
-		String debug = CEFConnectorConfiguration.getConnectorDebug();
-		if ("true".equalsIgnoreCase(debug)) {
-			context.setDebugMode(true);
-		} else {
-			context.setDebugMode(false);
-		}
-
 		// Get User defined format. This will map akamai api values to defined
 		// extension attributes
 		String formatHeaderStr = CEFConnectorConfiguration.getCEFFormatHeader();
