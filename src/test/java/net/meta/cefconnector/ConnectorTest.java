@@ -25,7 +25,15 @@ import net.meta.cefconnector.config.CEFContext;
 @PrepareForTest({ AkamaiProvider.class })
 @RunWith(PowerMockRunner.class)
 public class ConnectorTest {
-
+	@Test
+	public void testSingle() throws Exception {
+		PowerMockito.mockStatic(AkamaiProvider.class);
+		HttpResponse httpResponse = prepareResponse(200, getFilePath("input.json"));
+		PowerMockito.when(AkamaiProvider.getSecurityEvents(Mockito.any(CEFContext.class))).thenReturn(httpResponse);
+		CEFConnectorApp instance = new CEFConnectorApp();
+		instance.start();
+	}
+	
 	//@Test
 	public void testLoad320K() throws Exception {
 		PowerMockito.mockStatic(AkamaiProvider.class);
