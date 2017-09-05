@@ -386,8 +386,19 @@ public class CEFLogger {
 	 * String value Return: String
 	 */
 	private String base64Decode(JSONObject rec, String value) {
-		byte[] decodedValue = Base64.getMimeDecoder().decode(value); // Basic Base64 decoding
-		return new String(decodedValue, StandardCharsets.UTF_8);
+		try {
+			byte[] decodedValue = Base64.getMimeDecoder().decode(value); // Basic
+																			// Base64
+																			// decoding
+			return new String(decodedValue, StandardCharsets.UTF_8);
+		}
+		// the current string is not a valid base64encoded string. Log to warn
+		// and return original value
+		catch (IllegalArgumentException exception) {
+			log.warn("Input Event Meassage :" + rec.toString());
+			log.warn(exception.getMessage() +". Base64 field has invalid characters: \"" + value + "\". Please verify the field is URL decoded.");
+			return value;
+		}
 	}
 
 	/*
