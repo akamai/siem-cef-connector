@@ -2,8 +2,6 @@
 <Configuration status="warn">
     <Properties>
         <!--
-        File Log Configuration 1.4
-     
             log-path: Path location of file logs. Use relative or specific path (example: logs)
             log-name: File name for logs (example: filename)
             SizeBasedTriggeringPolicy: Log size rollover limit (example 1MB)
@@ -21,7 +19,10 @@
             CEFProtocol: Remote CEF Syslog Server Protocol (UDP/TCP)      
         
         -->
+        <!--  
         <Property name="CEFHost">ec2-54-201-108-81.us-west-2.compute.amazonaws.com</Property>
+        -->
+        <Property name="CEFHost">ec2-54-200-8-233.us-west-2.compute.amazonaws.com</Property>
         <Property name="CEFPort">546</Property>
         <Property name="CEFProtocol">TCP</Property>
         <!--
