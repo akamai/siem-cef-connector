@@ -2,7 +2,6 @@
 <Configuration status="warn">
     <Properties>
         <!--
-        File Log Configuration 1.4
      
             log-path: Path location of file logs. Use relative or specific path (example: logs)
             log-name: File name for logs (example: filename)
