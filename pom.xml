@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>CEFConnector</groupId>
 	<artifactId>CEFConnector</artifactId>
-	<version>2.0.0-SNAPSHOT</version>
+	<version>1.5.0</version>
 	<packaging>jar</packaging>
 	<dependencies>
 		<dependency>
