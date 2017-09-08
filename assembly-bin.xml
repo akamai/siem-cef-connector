@@ -27,7 +27,9 @@
             <fileMode>0744</fileMode>
         </file>
         <file>
-            <source>src/main/README</source>
+            <source>README.txt</source>
+            <outputDirectory>/</outputDirectory>
+            <filtered>true</filtered>
         </file>
     </files>
     <dependencySets>

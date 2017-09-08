@@ -1,4 +1,4 @@
-CEF Connector 1.5 Configuration for Akamai SIEM
+CEF Connector ${project.version} Configuration for Akamai SIEM
 
 System RequirementsAkamai’s CEF Connector requires Sun JRE 1.8+ to be installed. The latest JRE can be downloaded from the Sun Java site (Java Platform, Standard Edition) or installed from a software distribution package on Linux. Verify Java version (Linux): Use the command "java -version" to verify that your JRE is installed and available.
 

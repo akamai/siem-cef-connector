@@ -14,6 +14,7 @@ public enum ConnectionPool {
 
 	private ConnectionPool() {
 		HikariConfig config = new HikariConfig();
+		config.setDataSourceClassName("org.sqlite.SQLiteDataSource");
 		config.setJdbcUrl("jdbc:sqlite:cefconnector.db");
 		config.setIdleTimeout(0);
 		config.setAutoCommit(true);
