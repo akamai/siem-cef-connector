@@ -28,17 +28,9 @@ public class AkamaiProvider {
 	 * String policy, long limit Return: HttpResponse
 	 */
 	private static HttpResponse getSecurityEventsByOffset(CEFContext context) throws IOException {
-
-		// String akamaiHost = CEFConnectorConfiguration.getAkamaiData();
 		String requestUrl = null;
-
-		if (context.getDataLimit() > 0) {
-			requestUrl = String.format("%s/siem/v1/configs/%s?offset=%s&limit=%d", context.getRequestUrlHost(),
-					context.getConfigIds(), context.getDataOffset(), context.getDataLimit());
-		} else {
-			requestUrl = String.format("%s/siem/v1/configs/%s?offset=%s", context.getRequestUrlHost(),
-					context.getConfigIds(), context.getDataOffset());
-		}
+		
+		requestUrl = getURLByOffset(context);
 		HttpResponse response = callAPI(requestUrl, context);
 
 		return response;
@@ -52,16 +44,8 @@ public class AkamaiProvider {
 	private static HttpResponse getSecurityEventsByTime(CEFContext context) throws IOException {
 
 		String requestUrl = null;
-		if (!context.getDateTimeTo().isEmpty()) {
-			requestUrl = String.format("%s/siem/v1/configs/%s?from=%s&to=%s", context.getRequestUrlHost(),
-					context.getConfigIds(), context.getDateTimeFrom(), context.getDateTimeTo());
-		} else {
-			requestUrl = String.format("%s/siem/v1/configs/%s?from=%s", context.getRequestUrlHost(),
-					context.getConfigIds(), context.getDateTimeFrom());
-		}
-		if (context.getDataLimit() > 0) {
-			requestUrl = requestUrl + "&limit=" + context.getDataLimit();
-		}
+		
+		requestUrl = getURLByTime(context);
 		HttpResponse response = callAPI(requestUrl, context);
 
 		return response;
@@ -161,5 +145,38 @@ public class AkamaiProvider {
 			return AkamaiProvider.getSecurityEventsByTime(context);
 		else
 			return AkamaiProvider.getSecurityEventsByOffset(context);
+	}
+
+
+	public static String getURLByTime(CEFContext context){
+		String requestUrl = null;
+
+		if (!context.getDateTimeTo().isEmpty()) {
+			requestUrl = String.format("%s/siem/v1/configs/%s?from=%s&to=%s", context.getRequestUrlHost(),
+					context.getConfigIds(), context.getDateTimeFrom(), context.getDateTimeTo());
+		} else {
+			requestUrl = String.format("%s/siem/v1/configs/%s?from=%s", context.getRequestUrlHost(),
+					context.getConfigIds(), context.getDateTimeFrom());
+		}
+		if (context.getDataLimit() > 0) {
+			requestUrl = requestUrl + "&limit=" + context.getDataLimit();
+		}
+
+		return requestUrl;
+	}
+
+
+	public static String getURLByOffset(CEFContext context){
+		String requestUrl = null;
+
+		if (context.getDataLimit() > 0) {
+			requestUrl = String.format("%s/siem/v1/configs/%s?offset=%s&limit=%d", context.getRequestUrlHost(),
+					context.getConfigIds(), context.getDataOffset(), context.getDataLimit());
+		} else {
+			requestUrl = String.format("%s/siem/v1/configs/%s?offset=%s", context.getRequestUrlHost(),
+					context.getConfigIds(), context.getDataOffset());
+		}
+
+		return requestUrl;
 	}
 }

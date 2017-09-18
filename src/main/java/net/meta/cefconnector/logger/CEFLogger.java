@@ -564,7 +564,7 @@ public class CEFLogger {
 		return tempString;
 	}
 
-	public void processLogLine(CEFContext context, String line) {
+	public Map<String, String> processLogLine(CEFContext context, String line) {
 		if (log.isDebugEnabled()) {
 			log.debug(line);
 		}
@@ -611,6 +611,8 @@ public class CEFLogger {
 		catch (Exception e) {
 			log.error("JSON Object: " + line + "\n Context :" + context.toString(), e);
 		}
+		
+		return params;
 	}
 
 	public String processToken(String line) {
