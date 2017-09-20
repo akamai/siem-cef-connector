@@ -247,14 +247,27 @@ public class CEFLogger {
 																				// API
 																				// Variable
 																				// constructs
-					for (int ctrl2 = 0; ctrl2 < (paramDefinition.length - 1); ctrl2++) {
-						if (ctrl2 == 0) {
-							if (rec.has(paramDefinition[ctrl2])) {
-								tempObject = rec.getJSONObject(paramDefinition[ctrl2]);
+					if (paramDefinition.length == 1 && "custom".equalsIgnoreCase(paramDefinition[0])) {
+						final String key = paramDefinition[0]; 
+						if (rec.has(key)) {
+							Object obj = rec.get(key);
+							if (obj instanceof JSONObject) { 
+								final StringBuilder builder = new StringBuilder();
+								parse((JSONObject) obj, builder);
+								tempObject = new JSONObject();
+								tempObject.put(key, builder.toString());
 							}
-						} else if (tempObject != null) {
-							if (tempObject.has(paramDefinition[ctrl2])) {
-								tempObject = tempObject.getJSONObject(paramDefinition[ctrl2]);
+						}
+					} else {
+						for (int ctrl2 = 0; ctrl2 < (paramDefinition.length - 1); ctrl2++) {
+							if (ctrl2 == 0) {
+								if (rec.has(paramDefinition[ctrl2])) {
+									tempObject = rec.getJSONObject(paramDefinition[ctrl2]);
+								}
+							} else if (tempObject != null) {
+								if (tempObject.has(paramDefinition[ctrl2])) {
+									tempObject = tempObject.getJSONObject(paramDefinition[ctrl2]);
+								}
 							}
 						}
 					}
@@ -340,7 +353,17 @@ public class CEFLogger {
 
 		return params;
 	}
-
+	
+	private static void parse(final JSONObject jsonObject, StringBuilder builder) {
+		for (String key : jsonObject.keySet()) {
+			Object obj = jsonObject.get(key);
+			if (obj instanceof JSONObject) {
+				parse((JSONObject)obj, builder);
+			} else {
+				builder.append(obj);
+			}
+		}
+	}
 	/*
 	 * Description: Decodes URL Encoded String Arguments: String URLEncoded
 	 * Return: String
