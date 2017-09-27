@@ -4,8 +4,29 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>CEFConnector</groupId>
 	<artifactId>CEFConnector</artifactId>
-	<version>1.5.0</version>
+	<version>1.6.0</version>
 	<packaging>jar</packaging>
+	<distributionManagement>
+		<repository>
+			<id>nexus</id>
+			<name>Luna Common Release</name>
+			<url>https://lunabuild.akamai.com/nexus/service/local/staging/deploy/maven2</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus</id>
+			<name>Luna Common Snapshots</name>
+			<url>https://lunabuild.akamai.com/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+	<repositories>
+		<repository>
+			<id>mvn-akamai</id>
+			<url>https://lunabuild.akamai.com/nexus/content/groups/public/</url>
+			<snapshots>
+				<updatePolicy>interval:10</updatePolicy>
+			</snapshots>
+		</repository>
+	</repositories>	
 	<dependencies>
 		<dependency>
 			<groupId>com.lmax</groupId>
@@ -219,9 +240,11 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<version>2.8.2</version>
-				<configuration>
+				<!--  				
+ 				<configuration>
 					<skip>true</skip>
 				</configuration>
+				-->
 			</plugin>
 		</plugins>
 		<resources>
