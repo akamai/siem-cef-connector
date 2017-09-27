@@ -1,6 +1,5 @@
 package net.meta.cefconnector;
 
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.ResourceBundle;

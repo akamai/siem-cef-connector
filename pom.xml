@@ -1,32 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+		<modelVersion>4.0.0</modelVersion>
+	<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+	<parent>
+	    <groupId>com.akamai</groupId>
+	    <artifactId>luna</artifactId>
+	    <version>1.3</version>
+	</parent>	
 	<groupId>CEFConnector</groupId>
 	<artifactId>CEFConnector</artifactId>
 	<version>1.6.0</version>
 	<packaging>jar</packaging>
-	<distributionManagement>
-		<repository>
-			<id>nexus</id>
-			<name>Luna Common Release</name>
-			<url>https://lunabuild.akamai.com/nexus/service/local/staging/deploy/maven2</url>
-		</repository>
-		<snapshotRepository>
-			<id>nexus</id>
-			<name>Luna Common Snapshots</name>
-			<url>https://lunabuild.akamai.com/nexus/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
-	<repositories>
-		<repository>
-			<id>mvn-akamai</id>
-			<url>https://lunabuild.akamai.com/nexus/content/groups/public/</url>
-			<snapshots>
-				<updatePolicy>interval:10</updatePolicy>
-			</snapshots>
-		</repository>
-	</repositories>	
 	<dependencies>
 		<dependency>
 			<groupId>com.lmax</groupId>
@@ -166,6 +151,13 @@
 			<version>1.7.0</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+		<dependency>
+		    <groupId>commons-io</groupId>
+		    <artifactId>commons-io</artifactId>
+		    <version>2.5</version>
+		    <scope>test</scope>
+		</dependency>		
 		<dependency>
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
