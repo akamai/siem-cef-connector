@@ -85,7 +85,7 @@ public class ConnectorTest {
 		instance.start();
 	}
 	
-	@Test
+	//@Test
 	public void testLoad_1_600K() throws Exception {
 		PowerMockito.mockStatic(AkamaiProvider.class);
 		
