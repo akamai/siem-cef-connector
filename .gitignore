@@ -9,3 +9,4 @@ logs
 /bin/
 *.iml
 .idea/*
+/cefconnector.db
