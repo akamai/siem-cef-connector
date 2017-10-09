@@ -3,6 +3,8 @@ package net.meta.cefconnector;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -31,7 +33,7 @@ public class ParseLogLineTest {
 				map.toString());
 	}
 
-	
+
 	/**
 	 * Test for validating DLR's are processed as per requirement
 	 * @throws Exception
@@ -59,6 +61,72 @@ public class ParseLogLineTest {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	@Test
+	public void dlrWithMultipleRuleID() throws Exception{
+
+		CEFContext ctx = init();
+		CEFLogger cf = new CEFLogger();
+		File input = new File(this.getClass().getResource("multipleRulesDLR.json").getFile());
+		File res = new File(this.getClass().getResource("multipleRulesResponse.json").getFile());
+
+
+		BufferedReader br = new BufferedReader(new FileReader(input));
+		BufferedReader re = new BufferedReader(new FileReader(res));
+
+		String dlrLine = br.readLine();
+		String resLine = re.readLine();
+
+		Map<String, String> map = cf.processLogLine(ctx, dlrLine);
+		String message = createMessage(map);
+		Assert.assertEquals(resLine.trim(), message.trim());
+
+	}
+
+
+	@Test
+	public void decodingIssueKSD13842() throws Exception{
+
+		CEFContext ctx = init();
+		CEFLogger cf = new CEFLogger();
+		File input = new File(this.getClass().getResource("decodingIssueKSD13842.json").getFile());
+		File res = new File(this.getClass().getResource("decodingIssueKSD13842Response.json").getFile());
+
+
+		BufferedReader br = new BufferedReader(new FileReader(input));
+		BufferedReader re = new BufferedReader(new FileReader(res));
+
+		String dlrLine = br.readLine();
+		String resLine = re.readLine();
+
+		Map<String, String> map = cf.processLogLine(ctx, dlrLine);
+		String message = createMessage(map);
+		Assert.assertEquals(resLine.trim(), message.trim());
+
+	}
+
+	@Test
+	public void decodingWithPlus() throws Exception{
+
+		CEFContext ctx = init();
+		CEFLogger cf = new CEFLogger();
+		File input = new File(this.getClass().getResource("decodingIssuePlusDLR.json").getFile());
+		File res = new File(this.getClass().getResource("decodingIssuePlusResponse.json").getFile());
+
+
+		BufferedReader br = new BufferedReader(new FileReader(input));
+		BufferedReader re = new BufferedReader(new FileReader(res));
+
+		String dlrLine = br.readLine();
+		String resLine = re.readLine();
+
+		Map<String, String> map = cf.processLogLine(ctx, dlrLine);
+		String message = createMessage(map);
+		System.out.println(message);
+		Assert.assertEquals(resLine.trim(), message.trim());
+
+
 	}
 
 
