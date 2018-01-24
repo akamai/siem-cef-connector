@@ -21,6 +21,8 @@ import java.util.StringTokenizer;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.HttpHost;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -118,11 +120,23 @@ public class AkamaiProvider {
 	private static HttpResponse callAPI(String requestUrl, CEFContext context) throws IOException {
 		log.info(String.format("OPEN API Request URL:%s", requestUrl));
 		HttpClient client = getClient(context);
+		RequestConfig configProxy = null;
+		// Add http proxy
+                if (context.getProxyHost() != "") {
+			log.debug("Proxy Host = " + context.getProxyHost());
+			HttpHost proxy = new HttpHost(context.getProxyHost(), context.getProxyPort(), "http");
+			configProxy = RequestConfig.custom()
+				.setProxy(proxy)
+				.build();
+		}
 
 		HttpGet request = new HttpGet(requestUrl);
 		// Checked in the code requested by Dipen
 		request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
 		request.addHeader(HttpHeaders.ACCEPT_ENCODING, "gzip");
+		if (configProxy != null) {
+			request.setConfig(configProxy);
+		}
 
 		HttpResponse response = client.execute(request);
 

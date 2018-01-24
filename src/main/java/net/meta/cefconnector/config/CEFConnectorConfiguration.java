@@ -37,6 +37,7 @@ public class CEFConnectorConfiguration {
     private static final String DEFAULT_TIMEZONE = "UTC";
     private static final int DEFAULT_RETRY = 5;
     private static final int DEFAULT_LIMIT = 200000;
+    private static final int DEFAULT_PROXY_PORT = 8080;
     
     private static final String AKAMAI_POLICIES = "akamai.data.configs";
     
@@ -46,6 +47,9 @@ public class CEFConnectorConfiguration {
     private static final String AKAMAI_DATA_CLIENT_TOKEN = "akamai.data.clienttoken";
     private static final String AKAMAI_DATA_CLIENT_SECRET = "akamai.data.clientsecret";
     private static final String AKAMAI_DATA_HOST="akamai.data.baseurl";
+
+    private static final String PROXY_HOST = "connector.proxy.host";
+    private static final String PROXY_PORT = "connector.proxy.port";
     
     private static final String AKAMAI_DATA_TIMEBASED= "akamai.data.timebased";
     private static final String AKAMAI_DATA_TIMEBASED_FROM = "akamai.data.timebased.from";
@@ -421,6 +425,47 @@ public class CEFConnectorConfiguration {
             String message = "Unexpected Error: "+e+".";
             throw new IllegalArgumentException(message);
         }        
+    }
+    public static int getProxyPort() {
+	    try {
+		if(bundle.getString(PROXY_PORT)!=null && (!bundle.getString(PROXY_PORT).equals("")) && Integer.parseInt(bundle.getString(PROXY_PORT))>0){
+			try {
+				if(bundle.getString(PROXY_HOST)!=null && (!bundle.getString(PROXY_HOST).equals(""))){
+					return Integer.parseInt(bundle.getString(PROXY_PORT));
+				}
+				else{
+					return -1;
+				}
+			} catch (Exception e) {
+				String message = "Unexpected Error: "+e+".";
+				throw new IllegalArgumentException(message);
+			}
+		}
+		else if(bundle.getString(PROXY_PORT).equals(null) || (bundle.getString(PROXY_PORT).equals("")) && bundle.getString(PROXY_HOST).equals(null) || (bundle.getString(PROXY_HOST).equals(""))){
+			return -1;
+		}
+		else{
+			return DEFAULT_PROXY_PORT;
+		}
+	    } catch (Exception e) {
+		    String message = "Unexpected Error: "+e+".";
+		    throw new IllegalArgumentException(message);
+	    }
+    }
+    public static String getProxyHost() {
+	    try {
+		    String value = bundle.getString(PROXY_HOST);
+
+		    if((!value.equals(""))){
+			    return value;
+		    }
+		    else{
+			    return "";
+		    }
+	    } catch (Exception e) {
+		    String message = "Unexpected Error: "+e+".";
+		    throw new IllegalArgumentException(message);
+	    }
     }
     public static String getAkamaiPolicies() {
         try {
