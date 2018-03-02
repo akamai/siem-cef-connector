@@ -99,7 +99,11 @@ public class CEFConnectorApp {
 		context.setClientToken(CEFConnectorConfiguration.getAkamaiDataClientToken());
 		context.setHost(CEFConnectorConfiguration.getAkamaiDataHost());
 		context.setAccessToken(CEFConnectorConfiguration.getAkamaiDataAccessToken());
-
+		
+		// retrieve proxy config
+		context.setProxyHost(CEFConnectorConfiguration.getProxyHost());
+		context.setProxyPort(CEFConnectorConfiguration.getProxyPort());
+		
 		// retrieve data limit if set
 		context.setDataLimit(CEFConnectorConfiguration.getDataLimit());
 
