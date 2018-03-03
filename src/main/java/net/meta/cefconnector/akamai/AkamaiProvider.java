@@ -19,8 +19,10 @@ import java.io.IOException;
 import java.util.StringTokenizer;
 
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -123,7 +125,12 @@ public class AkamaiProvider {
 		// Checked in the code requested by Dipen
 		request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
 		request.addHeader(HttpHeaders.ACCEPT_ENCODING, "gzip");
-
+		
+		if(context.getProxyHost() != null && !context.getProxyHost().isEmpty()) {
+			HttpHost proxy = new HttpHost(context.getProxyHost(), context.getProxyPort(), "http");
+			RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
+			request.setConfig(config);
+		}
 		HttpResponse response = client.execute(request);
 
 		return response;

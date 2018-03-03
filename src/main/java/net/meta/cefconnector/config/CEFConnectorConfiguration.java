@@ -37,6 +37,7 @@ public class CEFConnectorConfiguration {
     private static final String DEFAULT_TIMEZONE = "UTC";
     private static final int DEFAULT_RETRY = 5;
     private static final int DEFAULT_LIMIT = 200000;
+    private static final int DEFAULT_PROXY_PORT = 8080;
     
     private static final String AKAMAI_POLICIES = "akamai.data.configs";
     
@@ -46,6 +47,9 @@ public class CEFConnectorConfiguration {
     private static final String AKAMAI_DATA_CLIENT_TOKEN = "akamai.data.clienttoken";
     private static final String AKAMAI_DATA_CLIENT_SECRET = "akamai.data.clientsecret";
     private static final String AKAMAI_DATA_HOST="akamai.data.baseurl";
+    
+    private static final String PROXY_HOST = "connector.proxy.host";
+    private static final String PROXY_PORT = "connector.proxy.port";
     
     private static final String AKAMAI_DATA_TIMEBASED= "akamai.data.timebased";
     private static final String AKAMAI_DATA_TIMEBASED_FROM = "akamai.data.timebased.from";
@@ -465,8 +469,36 @@ public class CEFConnectorConfiguration {
             throw new IllegalArgumentException(message);
         }  
     }
-    
-    
+	public static int getProxyPort() {
+		int port = DEFAULT_PROXY_PORT;
+		String proxyPort = null;
+		try {
+			final String proxyHost = bundle.getString(PROXY_HOST);
+			if (proxyHost != null && !proxyHost.isEmpty()) {
+				proxyPort = bundle.getString(PROXY_PORT);
+				if (proxyPort != null && !proxyPort.isEmpty()) {
+					port = Integer.parseInt(proxyPort);
+					if (port <= 0) {
+						port = DEFAULT_PROXY_PORT;
+					}
+				}
+			}
+		} catch (Exception exception) {
+			log.warn("Error parsing Porxy Port Property" + proxyPort);
+			throw new IllegalArgumentException("Error parsing Porxy Port " + proxyPort);
+		}
+		return port;
+	}
+	public static String getProxyHost() {
+		String proxyHost = "";
+		try {
+			proxyHost = bundle.getString(PROXY_HOST);
+		} catch (Exception exception) {
+			log.warn("Error parsing Porxy Host Property" + proxyHost);
+			throw new IllegalArgumentException("Error parsing Porxy Host Property" + proxyHost);
+		}
+		return proxyHost;
+	}
 	public static int getConsumerCount() {
 
 		int count = 3;

@@ -35,6 +35,8 @@ public class CEFContext {
 	private String[] urlEncodedFields;
 	private String delimiter;
 	private int consumerCount;
+	private String proxyHost;
+	private int proxyPort;
 
 	public int getConsumerCount() {
 		return consumerCount;
@@ -204,18 +206,40 @@ public class CEFContext {
 	public long getInterval() {
 		return interval;
 	}
+	
+	public String getProxyHost() {
+		return proxyHost;
+	}
+
+	public void setProxyHost(String proxyHost) {
+		this.proxyHost = proxyHost;
+	}
+
+	public int getProxyPort() {
+		return proxyPort;
+	}
+
+	public void setProxyPort(int proxyPort) {
+		this.proxyPort = proxyPort;
+	}
 
 	@Override
 	public String toString() {
 		String info = String.format(
 				"context {mode=%s, requestUrlHost=%s, configIds=[%s], fetch interval=%sms, fetch size=%s, Number of consumers=%s",
 				(offsetMode ? "Offset Based" : "Time Based"), requestUrlHost, configIds, interval, dataLimit, consumerCount);
-
+		
+		if(proxyHost != null && !proxyHost.isEmpty()) {
+			info += String.format(", Proxy Host=%s, Proxy Port=%s", proxyHost, proxyPort);
+		}
+		
 		if (offsetMode) {
 			info += String.format(", data offset=%s}", dataOffset);
 		} else {
 			info += String.format(", Time Range between %s and %s}", dateTimeFrom, dateTimeTo);
 		}
+		
+
 
 		return info;
 	}
