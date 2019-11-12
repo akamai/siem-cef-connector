@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
+import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -138,10 +139,9 @@ public class CEFConnectorApp {
 		long retryCtrl = 0;
 
 		while (!stopped) {
+			// initialize http response
+			HttpResponse response = null;
 			try {
-				// initialize http response
-				HttpResponse response = null;
-
 				response = AkamaiProvider.getSecurityEvents(context);
 
 				// retrieve the status code of the http response
@@ -234,6 +234,7 @@ public class CEFConnectorApp {
 			}
 			// Let consumer finish all tasks before starting a new
 			finally {
+				HttpClientUtils.closeQuietly(response);
 				// if the http request returned a non 200 status, try again
 				// until retryMax is reached
 				if (retryCtrl > 0 && retryCtrl <= retryMax)
