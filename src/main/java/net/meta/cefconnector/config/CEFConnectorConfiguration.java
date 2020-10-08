@@ -403,7 +403,7 @@ public class CEFConnectorConfiguration {
             String value = bundle.getString(AKAMAI_DATA_HOST);
              
             if((!value.equals("")))
-                if(value.endsWith(".cloudsecurity.akamaiapis.net/")||value.endsWith(".cloudsecurity.akamaiapis.net")){
+                if(value.endsWith(".cloudsecurity.akamaiapis.net/")||value.endsWith(".cloudsecurity.akamaiapis.net")||value.endsWith(".luna.akamaiapis.net/")||value.endsWith(".luna.akamaiapis.net")){
                    return value; 
                 }
                 else{

@@ -10,7 +10,7 @@
 	</parent>	
 	<groupId>CEFConnector</groupId>
 	<artifactId>CEFConnector</artifactId>
-	<version>1.7.0-SNAPSHOT</version>
+	<version>1.7.0</version>
 	<packaging>jar</packaging>
 	<dependencies>
 		<dependency>

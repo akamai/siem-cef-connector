@@ -106,4 +106,27 @@ public class CEFConncectorConfigurationTest {
 		CEFConnectorConfiguration.getCEFFormatHeader();
 
 	}
+	
+	@Test
+	public void testAkamaiDataHostInvalidValue() {
+	  Properties p =  new Properties();
+      p.setProperty("akamai.data.baseurl","wrong.domain.com");
+
+      ResourceBundleUtil rb =  new ResourceBundleUtil(p);
+      CEFConnectorConfiguration.setBundle(rb);
+
+      thrown.expect(IllegalArgumentException.class);
+      thrown.expectMessage("The required configuration parameter akamai.data.baseurl has an invalid value.");      
+      CEFConnectorConfiguration.getAkamaiDataHost();
+	}
+	
+	@Test
+	public void testAkamaiDataHostNewOpenApiDomainNoException() {
+	  Properties p =  new Properties();
+      p.setProperty("akamai.data.baseurl","valid.luna.akamaiapis.net");
+
+      ResourceBundleUtil rb =  new ResourceBundleUtil(p);
+      CEFConnectorConfiguration.setBundle(rb);
+      CEFConnectorConfiguration.getAkamaiDataHost();
+	}
 }
