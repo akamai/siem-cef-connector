@@ -564,8 +564,8 @@ public class CEFLogger {
 	 * it's in the correct format. Arguments: JSONObject rec Return: String
 	 */
 	private String ipv6src(JSONObject rec) {
-		if (rec != null && rec.has(DOL_ATTACKDATA) && rec.getJSONObject(DOL_ATTACKDATA).has(CLIENT_IP)) {
-			String ipv6src = rec.getJSONObject(DOL_ATTACKDATA).getString(CLIENT_IP);
+		if (rec != null && rec.has(ATTACK_DATA) && rec.getJSONObject(ATTACK_DATA).has(CLIENT_IP)) {
+			String ipv6src = rec.getJSONObject(ATTACK_DATA).getString(CLIENT_IP);
 			if (InetAddressUtils.isIPv6Address(ipv6src))
 				return ipv6src;
 			else
